@@ -1,14 +1,14 @@
-import { sql } from '@vercel/postgres';
+import { sql } from '@vercel/postgres'
 import {
   CustomerField,
   CustomersTableType,
   InvoiceForm,
   InvoicesTable,
   LatestInvoiceRaw,
-  User,
   Revenue,
-} from './definitions';
-import { formatCurrency } from './utils';
+  User,
+} from './definitions'
+import { formatCurrency } from './utils'
 
 export async function fetchRevenue() {
   // Add noStore() here to prevent the response from being cached.
@@ -18,12 +18,12 @@ export async function fetchRevenue() {
     // Artificially delay a response for demo purposes.
     // Don't do this in production :)
 
-    // console.log('Fetching revenue data...');
-    // await new Promise((resolve) => setTimeout(resolve, 3000));
+    console.log('Fetching revenue data...');
+    await new Promise((resolve) => setTimeout(resolve, 3000));
 
     const data = await sql<Revenue>`SELECT * FROM revenue`;
 
-    // console.log('Data fetch completed after 3 seconds.');
+    console.log('Data fetch completed after 3 seconds.');
 
     return data.rows;
   } catch (error) {
@@ -34,12 +34,18 @@ export async function fetchRevenue() {
 
 export async function fetchLatestInvoices() {
   try {
+
+    console.log('Fetching latest invoices data...');
+    await new Promise((resolve) => setTimeout(resolve, 6000));
+
     const data = await sql<LatestInvoiceRaw>`
       SELECT invoices.amount, customers.name, customers.image_url, customers.email, invoices.id
       FROM invoices
       JOIN customers ON invoices.customer_id = customers.id
       ORDER BY invoices.date DESC
       LIMIT 5`;
+
+      console.log('Data fetch completed after 6 seconds.');
 
     const latestInvoices = data.rows.map((invoice) => ({
       ...invoice,
@@ -54,6 +60,7 @@ export async function fetchLatestInvoices() {
 
 export async function fetchCardData() {
   try {
+    await new Promise(resolve => setTimeout(resolve, 4000))
     // You can probably combine these into a single SQL query
     // However, we are intentionally splitting them to demonstrate
     // how to initialize multiple queries in parallel with JS.
